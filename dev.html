@@ -95,7 +95,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
         } else if (cmd === ".white"||cmd == ".light") {
           doWhiteTheme();
         } else if (cmd == ".fullscreen")  {
-        	openFullsreen()
+        	openFullscreen()
+        } else if (RegExp("^.store (.+)=(.+)").test(cmd))  {
+          let m = /^.store (.+)=(.+)/.exec(cmd)
+          let k = m[1].trim()
+          let v = m[2].trim()
+          //alert(k+v)
+          localStorage.setItem(k,v)
+        } else if (cmd == ".storage")  {
+          let keys = Object.keys(localStorage)
+          keys.forEach((s)=>{
+            this.value+=s+"="+localStorage.getItem(s)+"\n"
+          })
         } else if (cmd) { 
         //  doCLI(cmd);
         }
