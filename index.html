@@ -1,165 +1,77 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <meta charset="utf-8">
-  <meta name="description" content="Just Type">
-  <meta name="author" content="Uus Noviardi">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="cache-control" content="no-cache" />
-  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"> 
-  <title>Just Type</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <title>aType - Type and save to localStorage</title>
 </head>
 
-<body>
-
-<div class="pure-g pure-form">
-  <div class="pure-u-1">
-<textarea id="ta_result" class="light">
-Just Type
-
-</textarea>
-  </div>
-</div>
- 
-<style type="text/css">
-div.nowrap {
-  white-space: nowrap;
-}
-body, input { 
-  font-family: monospace
-}
-textarea {
-  position: fixed;
-  resize: none;
-  width: 100%;
-  /*height: 97vh;*/
-  height: 100%;
-  margin: 0;
-  padding: 1%;
-  overflow: scroll;
-  white-space: nowrap;
-  font-family: monospace;
-}
-
-textarea.light {
-  border: 1px solid #999999;
-}
-textarea.dark {
-  background-color: #000;
-  border: 1px solid #000;
-  color: #00ff00;
-}
-
-input, button { display: inline-block; float: left; }
-
-.padding-1 { padding: 1% }
-.inline { display: inline }
-</style>
+<body><div id="app">
+<h1>aType - Type and save to localStorage</h1>
+<button v-on:click="newTA()">New</button>
+<input type="text" cols="15" placeholder="newkey_here" v-model="vmnewkey">
+Keys ({{ getLSLength() }})
+<select id="vmkeySelect" style="" v-model="vmkey" @change="vmkeyChange()"> 
+<option v-for="k in vmkeys" :value="k">{{k}}</option>
+</select>
+<textarea rows="30" style="display:block;width:100%;white-space:nowrap;margin: 5px 0 5px" v-model="vmta"></textarea>
+<button v-on:click="vmta=''">Clear</button>
+<button v-on:click="vmkeyChange()">Load</button>
+<button v-on:click="saveTA()">Save</button>
+<button v-on:click="">Import</button>
+<button v-on:click="exportTA()">Export</button>
+ | <button v-on:click="deleteTA()">Delete</button>
+<div style="display:block">{{ message }} </div>
+</div></body>
 
 <script>
-const key = "22d33340-ea84-11e9-bf2c-03e4cd72e0f4";
-const taResult = document.getElementById("ta_result");
-/*
-const btStop = document.getElementById("bt_stop");
-const inCli = document.getElementById("in_cli");
-const dvTime = document.getElementById("dv_time");
-const inServerUrl = document.getElementById("in_server_url");
-*/
-
-function doDarkTheme() {
-  taResult.className="dark"; 
-}
-
-function doWhiteTheme() {
-  taResult.className="light"; 
-}
-
-document.addEventListener("DOMContentLoaded", function(event) {
-
-  // DOM 
-  
-  var startTime, endTime;
-  
-  taResult.addEventListener("keyup", function(event) {
-      event.preventDefault();
-      if (event.keyCode === 13) {
-        var lines = this.value.split("\n");
-        var cmd = lines[lines.length-2];
-        //document.getElementById("in_cli").value = cmd;
-        if (cmd === ".clear") {
-          taResult.value = "";
-         // dvTime.innerHTML = "";
-        } else if (cmd === ".dark") {
-          doDarkTheme();
-        } else if (cmd === ".white"||cmd == ".light") {
-          doWhiteTheme();
-        } else if (cmd == ".fullscreen")  {
-        	openFullsreen()
-        } else if (cmd) { 
-        //  doCLI(cmd);
-        }
-      }
-    });
-
-
-
-  // Functions
-  
-  function doCLI(cmd) {
-    var server_url = inServerUrl.value;
-   // dvTime.innerHTML = "Executing, please wait...";
-    xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        taResult.value += this.responseText.replace(/\r?\n/g, "\r\n");
-        endTime = (new Date()).getTime();
-        xhrTime = (endTime - startTime)/1000;
-        dvTime.innerHTML = "("+xhrTime+" s)";
-        //document.getElementById("bt_stop").style.display="none";
-      } else if (this.status == 503) {
-        dvTime.innerHTML = "503 Server Error!";
-        //document.getElementById("bt_stop").style.display="none";
-      }
-    };
-    xhr.open("GET", server_url+"/cli?key="+key+"&cmd="+cmd, true);
-    xhr.setRequestHeader("Cache-Control", "no-cache");
-    xhr.send();
-    startTime = (new Date()).getTime();
-  };
-});
-
-var elem = document.documentElement;
-
-/* View in fullscreen */
-function openFullscreen() {
-  if (elem.requestFullscreen) {
-    elem.requestFullscreen();
-  } else if (elem.mozRequestFullScreen) { /* Firefox */
-    elem.mozRequestFullScreen();
-  } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-    elem.webkitRequestFullscreen();
-  } else if (elem.msRequestFullscreen) { /* IE/Edge */
-    elem.msRequestFullscreen();
+  function beautifyJSON(s) {
+    var o = {}
+	try { o = JSON.parse(s); return JSON.stringify(o,null,2) }
+	catch(e) { return s }
   }
-}
-
-/* Close fullscreen */
-function closeFullscreen() {
-  if (document.exitFullscreen) {
-    document.exitFullscreen();
-  } else if (document.mozCancelFullScreen) { /* Firefox */
-    document.mozCancelFullScreen();
-  } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-    document.webkitExitFullscreen();
-  } else if (document.msExitFullscreen) { /* IE/Edge */
-    document.msExitFullscreen();
+  
+  function download(filename, text) {
+    var textCopy = text;
+	var element = document.createElement('a')
+	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(textCopy))
+	element.setAttribute('download', filename)
+	element.style.display = 'none'
+	document.body.appendChild(element)
+	element.click()
+	document.body.removeChild(element)
   }
-}
 
+  
+  var app = new Vue({
+    el: '#app',
+	data: {
+	  message: '...',
+	  vmkeys: Object.keys(localStorage),
+	  vmkey: '',
+	  vmta: '',
+	  vmnewkey: ''
+	},
+	methods: {
+	  messageUpper: function () { 
+	    return this.message.length
+	  },
+	  getLSLength: function () { return localStorage.length },
+	  updateVmkey: function () { this.vmkeys = Object.keys(localStorage) },
+	  vmkeyChange: function () { this.vmta = beautifyJSON(localStorage.getItem(this.vmkey)) },
+	  clearTA: function () { this.vmta = '' },
+	  exportTA: function () { download(this.vmkey+'.txt', this.vmta) },
+	  newTA: function () { 
+	    if (!this.vmkeys.includes(this.vmnewkey) && this.vmnewkey) { 
+		  localStorage.setItem(this.vmnewkey, this.vmta) 
+		  this.updateVmkey()
+		} else { alert('Error on keyname') }
+	  },
+	  saveTA: function () { localStorage.setItem(this.vmkey, this.vmta); this.showMessage('Saving Text to localStorage') },
+	  deleteTA: function () { localStorage.removeItem(this.vmkey); this.updateVmkey(); this.showMessage('Deleting ('+ this.vmkey +') Text from localStorage') },
+	  showMessage: function (text) { this.message = text; setTimeout(()=>{this.message = ''},3000) }
+	}
+  })
 </script>
-
-</script>
-
-</body>
 </html>
