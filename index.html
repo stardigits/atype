@@ -4,15 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-  <title>aType - Type and save to localStorage</title>
+  <title>aType - Type and Save to localStorage</title>
 </head>
 
 <body><div id="app">
-<h1>aType - Type and save to localStorage</h1>
+<div style="display:block;margin: 5px"><b>aType - Type and Save to localStorage</b></div>
 <button v-on:click="newTA()">New</button>
-<input type="text" cols="15" placeholder="newkey_here" v-model="vmnewkey">
+<input type="text" size="10" placeholder="newkey_here" v-model="vmnewkey">
 Keys ({{ getLSLength() }})
-<select id="vmkeySelect" style="" v-model="vmkey" @change="vmkeyChange()"> 
+<select id="vmkeySelect" style="width:100px" v-model="vmkey" @change="vmkeyChange()"> 
 <option v-for="k in vmkeys" :value="k">{{k}}</option>
 </select>
 <textarea rows="30" style="display:block;width:100%;white-space:nowrap;margin: 5px 0 5px" v-model="vmta"></textarea>
@@ -22,7 +22,7 @@ Keys ({{ getLSLength() }})
 <button v-on:click="">Import</button>
 <button v-on:click="exportTA()">Export</button>
  | <button v-on:click="deleteTA()">Delete</button>
-<div style="display:block">{{ message }} </div>
+<div style="display:block">{{ message }}</div>
 </div></body>
 
 <script>
@@ -47,7 +47,7 @@ Keys ({{ getLSLength() }})
   var app = new Vue({
     el: '#app',
 	data: {
-	  message: '...',
+	  message: '',
 	  vmkeys: Object.keys(localStorage),
 	  vmkey: '',
 	  vmta: '',
