@@ -7,7 +7,7 @@
   <title>aType - Type and Save to localStorage</title>
 </head>
 
-<body><div id="app">
+<body style="height:1080px"><div id="app">
 <div style="display:block;margin: 5px"><b>aType - Type and Save to localStorage</b></div>
 <button v-on:click="newTA()">New</button>
 <input type="text" size="10" placeholder="newkey_here" v-model="vmnewkey">
@@ -71,7 +71,8 @@ Keys ({{ getLSLength() }})
 	  saveTA: function () { localStorage.setItem(this.vmkey, this.vmta); this.showMessage('Saving Text to localStorage') },
 	  deleteTA: function () { localStorage.removeItem(this.vmkey); this.updateVmkey(); this.showMessage('Deleting ('+ this.vmkey +') Text from localStorage') },
 	  showMessage: function (text) { this.message = text; setTimeout(()=>{this.message = ''},3000) }
-	}
+	},
+	mounted() { window.scrollTo(0,0) }
   })
 </script>
 </html>
