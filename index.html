@@ -19,7 +19,7 @@ Keys ({{ getLSLength() }})
 <button v-on:click="vmta=''">Clear</button>
 <button v-on:click="vmkeyChange()">Load</button>
 <button v-on:click="saveTA()">Save</button>
-<button v-on:click="">Import</button>
+<input id="fileInput" ref="fileInput" type="file" name="filename" @change="previewFiles" style="display:none"><button @click="$refs.fileInput.click()">Import</button>
 <button v-on:click="exportTA()">Export</button>
  | <button v-on:click="deleteTA()">Delete</button>
 <div style="display:block">{{ message }}</div>
@@ -42,7 +42,23 @@ Keys ({{ getLSLength() }})
 	element.click()
 	document.body.removeChild(element)
   }
-
+  
+  function importEventHandler(evt) {
+    var content = ''
+	console.log(evt.target.files)
+    var file = evt.target.files[0]
+	var textType = /text.*/
+	if (file.type.match(textType)) {
+      var reader = new FileReader()
+	  reader.onload = function(e) {
+        content = reader.result
+      }
+      reader.readAsText(file)
+	} else {
+	  console.log('Incorrect file type')
+	}
+	return content
+  }
   
   var app = new Vue({
     el: '#app',
@@ -61,6 +77,7 @@ Keys ({{ getLSLength() }})
 	  updateVmkey: function () { this.vmkeys = Object.keys(localStorage) },
 	  vmkeyChange: function () { this.vmta = beautifyJSON(localStorage.getItem(this.vmkey)) },
 	  clearTA: function () { this.vmta = '' },
+	  updateTA: function (text) { this.vmta = text },
 	  exportTA: function () { download(this.vmkey+'.txt', this.vmta) },
 	  newTA: function () { 
 	    if (!this.vmkeys.includes(this.vmnewkey) && this.vmnewkey) { 
@@ -70,6 +87,25 @@ Keys ({{ getLSLength() }})
 	  },
 	  saveTA: function () { localStorage.setItem(this.vmkey, this.vmta); this.showMessage('Saving Text to localStorage') },
 	  deleteTA: function () { localStorage.removeItem(this.vmkey); this.updateVmkey(); this.showMessage('Deleting ('+ this.vmkey +') Text from localStorage') },
+	  previewFiles: function (event) { 
+	    console.log(event.target.files)
+		var file = event.target.files[0]
+		var textType = /text.*/
+		if (file.type.match(textType)) {
+          var reader = new FileReader()
+		  reader.onload = function(e) {
+            var content = reader.result
+			app.vmta = content
+			app.vmnewkey = file.name
+          }
+          reader.readAsText(file)
+	    } else {
+		  console.log('Incorrect file type')
+		}
+	  },
+	  pFiles: function (event) {
+	    console.log(importEventHandler(event))
+	  },
 	  showMessage: function (text) { this.message = text; setTimeout(()=>{this.message = ''},3000) }
 	},
 	mounted() { window.scrollTo(0,0) }
