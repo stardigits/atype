@@ -28,10 +28,15 @@ Keys ({{ getLSLength() }})
 <script>
   function beautifyJSON(s) {
     var o = {}
-	try { o = JSON.parse(s); return JSON.stringify(o,null,2) }
-	catch(e) { return s }
+    try { o = JSON.parse(s); return JSON.stringify(o,null,2) }
+    catch(e) { return s }
   }
   
+  function minifyJSON(s) {
+    var o = {}
+    try { o = JSON.parse(s); return JSON.stringify(o) }
+    catch(e) { return s }
+  }
   function download(filename, text) {
     var textCopy = text;
 	var element = document.createElement('a')
@@ -64,7 +69,7 @@ Keys ({{ getLSLength() }})
     el: '#app',
 	data: {
 	  message: '',
-	  vmkeys: Object.keys(localStorage),
+	  vmkeys: Object.keys(localStorage).sort(),
 	  vmkey: '',
 	  vmta: '',
 	  vmnewkey: ''
@@ -74,7 +79,7 @@ Keys ({{ getLSLength() }})
 	    return this.message.length
 	  },
 	  getLSLength: function () { return localStorage.length },
-	  updateVmkey: function () { this.vmkeys = Object.keys(localStorage) },
+	  updateVmkey: function () { this.vmkeys = Object.keys(localStorage).sort() },
 	  vmkeyChange: function () { this.vmta = beautifyJSON(localStorage.getItem(this.vmkey)) },
 	  clearTA: function () { this.vmta = '' },
 	  updateTA: function (text) { this.vmta = text },
